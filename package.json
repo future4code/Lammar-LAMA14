@@ -1,0 +1,20 @@
+{
+  "name": "lama-projeto",
+  "version": "1.0.0",
+  "description": "Projeto LAMA",
+  "main": "index.js",
+  "scripts": {
+    "test": "clear && echo \"Running tests...\" && jest --watchAll",
+      "start": "tsc && node --inspect ./build/src/index.js",
+      "dev": " ts-node-dev ./src/index.ts"
+  },
+  "keywords": [
+    "api",
+    "LAMA"
+  ],
+  "author": "Mauricio Gonçalves",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+  }
+}
