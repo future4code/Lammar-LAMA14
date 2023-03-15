@@ -38,3 +38,9 @@ export class Band {
         ))   
     }
 }
+
+export interface BandInputDTO {
+    name: string,
+    mainGenre: string,
+    responsible: string
+}
