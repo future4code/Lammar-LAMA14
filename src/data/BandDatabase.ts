@@ -1,5 +1,6 @@
 import { BaseDatabase } from "./BaseDatabase";
 import { Band } from "../model/Band";
+import { NotFoundError } from "../error/NotFoundError";
 
 export class BandDatabase extends BaseDatabase {
     private static TABLE_NAME = "NOME_TABELAS_BANDAS";
@@ -16,5 +17,17 @@ export class BandDatabase extends BaseDatabase {
         } catch (err) {
             throw new Error(err.sqlMessage || err.message)
         }
+    }
+    public async getBandByIdOrNameOrFail(input: string ) :Promise<Band>{
+        const band = await this.getConnection()
+        .select("*")
+        .from(BandDatabase.TABLE_NAME)
+        .where({id: input})
+        .orWhere({name: input})
+
+        if(!band[0]) {
+            throw new NotFoundError(`Unable to found Band with input: ${input}`)
+        }
+        return Band.toBand(band[0])!
     }
 }

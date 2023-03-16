@@ -30,4 +30,23 @@ export class BandController {
             await BaseDatabase.destroyConnection()
         }
     }
+    async getBandDetail(req: Request, res: Response) {
+        try {
+            const input =(req.query.id ?? req.query.name) as string
+            
+            const bandBusiness = new Bandbusiness(
+                new BandDatabase,
+                new IdGenerator,
+                new Authenticator
+            )
+            const band = await bandBusiness.getBandDetailByIdOrName(input)
+
+            res.status(200).send(band)
+        } catch (err) {
+            res.status(err.customErrorCode || 400).send({
+                message: err.message })
+        } finally{
+            await BaseDatabase.destroyConnection()
+        }
+    }
 }

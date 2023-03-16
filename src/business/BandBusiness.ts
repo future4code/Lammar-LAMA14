@@ -30,4 +30,10 @@ export class Bandbusiness {
         )     
 
     }
+    async getBandDetailByIdOrName(input: string): Promise<Band> {
+        if(input){
+            throw new InvalidInputError("Invalid input to registerBand")
+        }
+        return this.bandDatabase.getBandByIdOrNameOrFail(input)
+    }
 }
