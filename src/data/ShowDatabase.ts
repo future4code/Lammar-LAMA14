@@ -1,4 +1,5 @@
-import { Show, ShowOutputDTO, WeekDay } from "../model/Show";
+import { NotFoundError } from "../error/NotFoundError";
+import { Show, ShowInputDTO, ShowOutputDTO, WeekDay } from "../model/Show";
 import { BaseDatabase} from "./BaseDatabase"
 
 export class ShowDatabase extends BaseDatabase {
@@ -13,27 +14,19 @@ export class ShowDatabase extends BaseDatabase {
             end_time: show.getEndTime(),
             week_day: show.getWeekDay()
         })
-        .into(ShowDatabase.TABLE_NAME)
+        .into(this.tableNames.shows)
     }
     public async getShowsByTimes(
         weekDay: WeekDay,
         startTime: number,
         endTime: number
     ): Promise<ShowOutputDTO>{
-        const shows = await this.getConnection().raw(
-            `
-             SELECT show.id as id,
-             show.start_time as startTime,
-             show.end_time as endTime,
-             show.week_day as weekDay,
-           FROM ${ShowDatabase.TABLE_NAME} show
-           WHERE show.week_day = "${weekDay}"
-           AND WHERE show.start_time <= "${endTime}"  
-           AND WHERE show.end_time >= "${startTime}"
-           ORDER BY startTime ASC
-            `
-            )
-
+        const shows = await this.getConnection()
+        .select("*")
+        .where("end_time", ">", `${startTime}`)
+        .andWhere("start_time", "<", `${endTime}`)
+        .from(this.tableNames.shows)
+        
         return shows.map((show: any)=>{
             return {
                 id: show.id,
@@ -43,5 +36,35 @@ export class ShowDatabase extends BaseDatabase {
                 weekDay: show.weekDay
             }
         })    
+    }
+    public async getShowsByWeekDayOrFail(weekDay: WeekDay): Promise<ShowOutputDTO[]> {
+        const shows = await this.getConnection().raw(
+            `
+            SELECT show.id,
+                   band.id as bandID
+                   band.name as bandName,
+                   show.start_time as startTime,
+                   show.end_time as endTime,
+                   show.week_day as weekDay,
+                   band.music_genre as musicGenre,
+                   FROM ${this.tableNames.shows} show
+                   LEFT JOIN ${this.tableNames.bands} band ON band.id = show.band.id
+                   WHERE show.week_day = "${weekDay}"
+                   ORDER BY startTime ASC
+                      `
+        )
+        if(!shows.length) {
+            throw new NotFoundError(`Unable to found shows at ${weekDay}`)
+        }
+        return shows[0].map((data:any)=>({
+            id: data.id,
+            bandId: data.bandId,
+            startTime: data.startTime,
+            endTime: data.endTime,
+            weekDay: data.weekDay,
+            mainGenre: data.mainGenre
+        })
+
+        )
     }
 }

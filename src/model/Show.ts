@@ -44,17 +44,17 @@ export class Show {
         switch (data) {
             case "FRIDAY":
                 return WeekDay.FRIDAY;
-            break;
+            
             case "SATURDAY":
                 return WeekDay.SATURDAY;
-             break;    
+                 
              case "SUNDAY":
                 return WeekDay.SUNDAY;
-             break;
+            
             default:
 
             throw new InvalidInputError("invalid weekDay")
-                break;
+                
         }
     }
     public static toShow(data?: any ){
@@ -87,4 +87,6 @@ export enum WeekDay{
     weekDay: WeekDay
     startTime: number
     endTime: number
+    mainGenre?: string
+    bandName?: string
  }

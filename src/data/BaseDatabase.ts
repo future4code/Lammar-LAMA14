@@ -1,10 +1,15 @@
-import knex from "knex";
-import Knex   from "knex";
+import knex, { Knex } from "knex";
 
 
 export abstract class BaseDatabase {
 
     private static connection: Knex | null = null;
+
+    protected tableNames = {
+        bands: "NOME_TABELA_BANDAS",
+        shows: "NOME_TABELA_SHOWS",
+        users: "NOME_TABELA_USUARIOS"
+    }
 
     protected getConnection(): Knex{
         if(!BaseDatabase.connection){
